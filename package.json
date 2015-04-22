@@ -1,0 +1,15 @@
+{
+  "name": "my-postmark-uploader",
+  "version": "0.1.0",
+  "description": "upload postmark attachments to s3",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "s3",
+    "postmark"
+  ],
+  "author": "Gallagher Polyn",
+  "license": "ISC"
+}
