@@ -11,5 +11,11 @@
     "postmark"
   ],
   "author": "Gallagher Polyn",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "async": "^0.9.0",
+    "aws-sdk": "^2.1.24",
+    "gm": "^1.17.0",
+    "request": "^2.55.0"
+  }
 }
