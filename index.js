@@ -63,7 +63,10 @@ PostmarkS3Uploader.prototype.upload = function (req, done) {
                   });
                 },
                 function(cb){
-                  resizeImage(base64data,attachment.Name, self.s3, self.s3Bucket, cb); 
+                  resizeImage(base64data,attachment.Name, self.s3, self.s3Bucket,150,150,"thumb", cb); 
+                },
+                function(cb){
+                  resizeImage(base64data,attachment.Name, self.s3, self.s3Bucket,350,350,"medium", cb); 
                 }
               ],
               done
@@ -75,9 +78,10 @@ PostmarkS3Uploader.prototype.upload = function (req, done) {
   // }); // end req.on(end)
 };
 
-var resizeImage = function(res,url, awsClient, s3Bucket, cb) {
+var resizeImage = function(res,url, awsClient, s3Bucket, ht, width, suffix, cb) {
+  console.log("endpoint for s3...");
   console.log(awsClient.endpoint)
-  gm(res).resize(150, 150, '^').gravity('Center').extent(150, 150).quality(80).stream(function(err, stdout, stderr) {
+  gm(res).resize(ht, width, '^').gravity('Center').extent(ht, width).quality(80).stream(function(err, stdout, stderr) {
     if (err) {
       cb(err);
     } else {
@@ -89,23 +93,55 @@ var resizeImage = function(res,url, awsClient, s3Bucket, cb) {
       });
 
       stdout.on('end', function() {
+        var key = url.substr(url.lastIndexOf("/")+1) + ":" + suffix;
         var data = {
           ACL: 'public-read',
           Bucket: s3Bucket,
-          Key: url,
+          Key: key,
           Body: buf
         };
         awsClient.putObject(data, function(err, resp) {
           if (err) {
             console.log(err)
           } else {
-            cb(null, "put thumb");
+            cb(null, awsClient.endpoint.href + s3Bucket + "/" + key );
           }
         });
       });
     }
   });
 }
+// var resizeImage = function(res,url, awsClient, s3Bucket, cb) {
+//   console.log(awsClient.endpoint)
+//   gm(res).resize(150, 150, '^').gravity('Center').extent(150, 150).quality(80).stream(function(err, stdout, stderr) {
+//     if (err) {
+//       cb(err);
+//     } else {
+
+//       var buf = new Buffer(0);
+
+//       stdout.on('data', function(d) {
+//         buf = Buffer.concat([buf, d]);
+//       });
+
+//       stdout.on('end', function() {
+//         var data = {
+//           ACL: 'public-read',
+//           Bucket: s3Bucket,
+//           Key: url,
+//           Body: buf
+//         };
+//         awsClient.putObject(data, function(err, resp) {
+//           if (err) {
+//             console.log(err)
+//           } else {
+//             cb(null, "put thumb");
+//           }
+//         });
+//       });
+//     }
+//   });
+// }
 
 var putImageAsIs = function(res, targetUri, knoxClient, cb) {
 
